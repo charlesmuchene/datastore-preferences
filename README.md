@@ -1,3 +1,3 @@
 # Datastore Preferences parser
 
-A library to parse Android's datastore preferences
+A library to parse protobuf-based datastore preferences

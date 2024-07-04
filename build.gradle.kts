@@ -42,3 +42,15 @@ testing {
         }
     }
 }
+
+tasks.jar {
+    manifest {
+        attributes(
+            mapOf(
+                "Implementation-Title" to name,
+                "Implementation-Version" to version
+            )
+        )
+    }
+    archiveBaseName.set("DatastorePreferencesParser")
+}
