@@ -3,6 +3,7 @@
 plugins {
     kotlin("jvm") version "1.9.24"
     `java-library`
+    `maven-publish`
     id("com.google.protobuf") version "0.9.4"
 }
 
