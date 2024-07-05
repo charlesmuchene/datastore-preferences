@@ -16,7 +16,14 @@
 
 package com.charlesmuchene.datastore.preferences
 
+/**
+ * A preference. The [value] is treated as a [String] since all use-cases take in a [String] except for
+ * validation.
+ */
 sealed interface Preference {
+    val key: String
+    val value: String
+
     val text: String
         get() =
             when (this) {
@@ -29,20 +36,27 @@ sealed interface Preference {
                 is DoublePreference -> "Double"
                 is ByteArrayPreference -> "Byte Array"
             }
+
+    fun toPair() = key to value
 }
 
-data class BooleanPreference(val key: String, val value: Boolean) : Preference
+data class BooleanPreference(override val key: String, override val value: String) : Preference
 
-data class FloatPreference(val key: String, val value: Float) : Preference
+data class FloatPreference(override val key: String, override val value: String) : Preference
 
-data class IntPreference(val key: String, val value: Int) : Preference
+data class IntPreference(override val key: String, override val value: String) : Preference
 
-data class LongPreference(val key: String, val value: Long) : Preference
+data class LongPreference(override val key: String, override val value: String) : Preference
 
-data class StringPreference(val key: String, val value: String) : Preference
+data class StringPreference(override val key: String, override val value: String) : Preference
 
-data class StringSetPreference(val key: String, val value: Set<String>) : Preference
+data class StringSetPreference(override val key: String, val entries: Set<String>) : Preference {
+    override val value: String = entries.joinToString(SEPARATOR)
+    companion object {
+        const val SEPARATOR = "0A::0A"
+    }
+}
 
-data class DoublePreference(val key: String, val value: Double) : Preference
+data class DoublePreference(override val key: String, override val value: String) : Preference
 
-class ByteArrayPreference(val key: String, val value: ByteArray) : Preference
+class ByteArrayPreference(override val key: String, override val value: String) : Preference

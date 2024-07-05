@@ -35,14 +35,14 @@ fun parse(content: ByteArray): List<Preference> {
     }
     return data.preferencesMap.mapNotNull { (key, value) ->
         when (value.valueCase.number) {
-            1 -> BooleanPreference(key = key, value = value.boolean)
-            2 -> FloatPreference(key = key, value = value.float)
-            3 -> IntPreference(key = key, value = value.integer)
-            4 -> LongPreference(key = key, value = value.long)
+            1 -> BooleanPreference(key = key, value = value.boolean.toString())
+            2 -> FloatPreference(key = key, value = value.float.toString())
+            3 -> IntPreference(key = key, value = value.integer.toString())
+            4 -> LongPreference(key = key, value = value.long.toString())
             5 -> StringPreference(key = key, value = value.string)
-            6 -> StringSetPreference(key = key, value = value.stringSet.stringsList.toSet())
-            7 -> DoublePreference(key = key, value = value.double)
-            8 -> ByteArrayPreference(key = key, value = value.bytesArray.toByteArray())
+            6 -> StringSetPreference(key = key, entries = value.stringSet.stringsList.toSet())
+            7 -> DoublePreference(key = key, value = value.double.toString())
+            8 -> ByteArrayPreference(key = key, value = String(value.bytesArray.toByteArray()))
             else -> null
         }
     }
