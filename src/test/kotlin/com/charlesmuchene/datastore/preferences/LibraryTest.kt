@@ -29,14 +29,14 @@ class LibraryTest {
     @Test
     fun `malformed content throws exception`() {
         assertFailsWith<MalformedContentException> {
-            parse(ByteArray(size = 1))
+            parsePreferences(ByteArray(size = 1))
         }
     }
 
     @Test
     fun `content is parsed successfully`() {
         val content = Paths.get("src", "test", "resources", "preferences.preferences_pb").readBytes()
-        val preferences = parse(content)
+        val preferences = parsePreferences(content)
         println(preferences)
 
         val intPreference = preferences[0]

@@ -27,7 +27,7 @@ import com.google.protobuf.InvalidProtocolBufferException
  *
  * @throws [MalformedContentException] if the [content] is not valid protobuf format
  */
-fun parse(content: ByteArray): List<Preference> {
+fun parsePreferences(content: ByteArray): List<Preference> {
     val data = try {
         DatastorePreferences.PreferenceMap.parseFrom(content)
     } catch (e: InvalidProtocolBufferException) {

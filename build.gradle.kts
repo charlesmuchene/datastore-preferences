@@ -28,6 +28,7 @@ version = "1.0-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
 }
 
 kotlin {
@@ -60,14 +61,17 @@ testing {
     }
 }
 
-tasks.jar {
-    manifest {
-        attributes(
-            mapOf(
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to project.version
+tasks {
+    jar {
+        manifest {
+            attributes(
+                mapOf(
+                    "Implementation-Title" to project.name,
+                    "Implementation-Version" to project.version
+                )
             )
-        )
+        }
+        archiveBaseName.set("DatastorePreferencesParser")
+        from(configurations.runtimeClasspath.get().files.map { file -> if (file.isDirectory) file else zipTree(file) })
     }
-    archiveBaseName.set("DatastorePreferencesParser")
 }
