@@ -37,7 +37,6 @@ class LibraryTest {
     fun `content is parsed successfully`() {
         val content = Paths.get("src", "test", "resources", "preferences.preferences_pb").readBytes()
         val preferences = parsePreferences(content)
-        println(preferences)
 
         val intPreference = preferences[0]
         assertTrue(intPreference is IntPreference)
@@ -76,9 +75,10 @@ class LibraryTest {
 
         val byteArrayPreference = preferences[7]
         assertTrue(byteArrayPreference is ByteArrayPreference)
-        val zip = byteArrayOf(0x0A, 0x0A).zip(byteArrayPreference.value.toByteArray())
+        val zip = byteArrayOf(0x0A, 0x0A).zip(byteArrayPreference.content)
         assertEquals(expected = 2, actual = zip.size)
         assertTrue { zip.all { it.first == it.second } }
         assertEquals(expected = "byte-array", actual = byteArrayPreference.key)
+        assertTrue(byteArrayPreference.toString().uppercase().contains("0A0A"))
     }
 }

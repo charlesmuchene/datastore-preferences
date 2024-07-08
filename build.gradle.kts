@@ -16,11 +16,23 @@
 
 @file:Suppress("UnstableApiUsage")
 
+import proguard.gradle.ProGuardTask
+
+
 plugins {
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm") version "1.9.23"
     `java-library`
     `maven-publish`
     id("com.google.protobuf") version "0.9.4"
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.guardsquare:proguard-gradle:7.5.0")
+    }
 }
 
 group = "com.charlesmuchene.datastore.preferences"
@@ -60,6 +72,21 @@ testing {
         }
     }
 }
+val archiveName = "DatastorePreferencesParser"
+
+val proguard by tasks.registering(ProGuardTask::class) {
+    configuration(file(path = "proguard.pro"))
+    injars(tasks.named("jar", Jar::class))
+    val javaHome = System.getProperty("java.home")
+    libraryjars(
+        mapOf("jarfilter" to "!**.jar", "filter" to "!module-info.class"),
+        "$javaHome/jmods/java.base.jmod"
+    )
+    libraryjars(sourceSets.main.get().runtimeClasspath) // kotlin lib jars??
+    printmapping("mapping.txt")
+    val outputName = "$archiveName-${project.version}"
+    outjars(layout.buildDirectory.file("libs/$outputName-minified.jar"))
+}
 
 tasks {
     jar {
@@ -71,7 +98,11 @@ tasks {
                 )
             )
         }
-        archiveBaseName.set("DatastorePreferencesParser")
+        archiveBaseName.set(archiveName)
         from(configurations.runtimeClasspath.get().files.map { file -> if (file.isDirectory) file else zipTree(file) })
+    }
+
+    build {
+        finalizedBy(proguard)
     }
 }

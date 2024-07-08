@@ -51,12 +51,19 @@ data class LongPreference(override val key: String, override val value: String) 
 data class StringPreference(override val key: String, override val value: String) : Preference
 
 data class StringSetPreference(override val key: String, val entries: Set<String>) : Preference {
-    override val value: String = entries.joinToString(SEPARATOR)
-    companion object {
-        const val SEPARATOR = "0A::0A"
-    }
+    override val value: String = entries.joinToString()
+
+    override fun toString(): String = "StringSetPreference(key=$key, value=$value)"
 }
 
 data class DoublePreference(override val key: String, override val value: String) : Preference
 
-class ByteArrayPreference(override val key: String, override val value: String) : Preference
+class ByteArrayPreference(
+    override val key: String,
+    @Suppress("MemberVisibilityCanBePrivate") val content: ByteArray
+) : Preference {
+    @OptIn(ExperimentalStdlibApi::class)
+    override val value: String get() = content.toHexString()
+
+    override fun toString(): String = "ByteArrayPreference(key=$key, value=$value)"
+}

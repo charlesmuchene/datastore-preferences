@@ -42,7 +42,7 @@ fun parsePreferences(content: ByteArray): List<Preference> {
             5 -> StringPreference(key = key, value = value.string)
             6 -> StringSetPreference(key = key, entries = value.stringSet.stringsList.toSet())
             7 -> DoublePreference(key = key, value = value.double.toString())
-            8 -> ByteArrayPreference(key = key, value = String(value.bytesArray.toByteArray()))
+            8 -> ByteArrayPreference(key = key, content = value.bytesArray.toByteArray())
             else -> null
         }
     }
