@@ -16,4 +16,4 @@
 
 package com.charlesmuchene.datastore.preferences.exceptions
 
-class MalformedContentException : Exception("The given content is invalid")
+class MalformedContentException(override val cause: Throwable?) : Exception("Cannot parse content", cause)

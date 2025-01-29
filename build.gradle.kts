@@ -16,80 +16,63 @@
 
 @file:Suppress("UnstableApiUsage")
 
-import proguard.gradle.ProGuardTask
-
+import com.google.protobuf.gradle.id
 
 plugins {
-    kotlin("jvm") version "1.9.23"
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.protobuf)
     `java-library`
     `maven-publish`
-    id("com.google.protobuf") version "0.9.4"
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("com.guardsquare:proguard-gradle:7.5.0")
-    }
-}
-
-group = "com.charlesmuchene.datastore.preferences"
-version = "1.0-SNAPSHOT"
+group = "com.charlesmuchene"
+version = "0.0.1"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
     withSourcesJar()
 }
 
 kotlin {
-    jvmToolchain(17)
-}
-
-repositories {
-    mavenCentral()
+    jvmToolchain(21)
 }
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:4.27.2"
+        artifact = with(libs.protobuf.compiler.get()) { "$module:$version" }
     }
-}
 
-dependencies {
-    implementation("com.google.protobuf:protobuf-kotlin:4.27.2")
-}
-
-testing {
-    suites {
-        val test by getting(JvmTestSuite::class) {
-            useKotlinTest("1.9.24")
-
-            dependencies {
-                implementation("org.junit.jupiter:junit-jupiter-engine:5.9.1")
+    generateProtoTasks {
+        all().configureEach {
+            builtins {
+                id("kotlin")
             }
         }
     }
 }
-val archiveName = "DatastorePreferencesParser"
 
-val proguard by tasks.registering(ProGuardTask::class) {
-    configuration(file(path = "proguard.pro"))
-    injars(tasks.named("jar", Jar::class))
-    val javaHome = System.getProperty("java.home")
-    libraryjars(
-        mapOf("jarfilter" to "!**.jar", "filter" to "!module-info.class"),
-        "$javaHome/jmods/java.base.jmod"
-    )
-    libraryjars(sourceSets.main.get().runtimeClasspath) // kotlin lib jars??
-    printmapping("mapping.txt")
-    val outputName = "$archiveName-${project.version}"
-    outjars(layout.buildDirectory.file("libs/$outputName-minified.jar"))
+dependencies {
+    api(libs.protobuf.runtime)
+
+    testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("parser") {
+            from(components["java"])
+            artifactId = "datastore-preferences-parser"
+        }
+    }
 }
 
 tasks {
-    jar {
+    named<Jar>("jar") {
         manifest {
             attributes(
                 mapOf(
@@ -98,11 +81,14 @@ tasks {
                 )
             )
         }
-        archiveBaseName.set(archiveName)
-        from(configurations.runtimeClasspath.get().files.map { file -> if (file.isDirectory) file else zipTree(file) })
-    }
+        includeEmptyDirs = false
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        archiveBaseName.set("DatastorePreferencesParser")
 
-    build {
-        finalizedBy(proguard)
+        exclude("**/*.proto")
+        from(
+            configurations.runtimeClasspath.get()
+                .map { file -> if (file.isDirectory) file else zipTree(file) }
+        )
     }
 }

@@ -17,8 +17,9 @@
 package com.charlesmuchene.datastore.preferences
 
 /**
- * A preference. The [value] is treated as a [String] since all use-cases take in a [String] except for
- * validation.
+ * A preference.
+ *
+ * The [value] is treated as a [String] since all use-cases accept a [String] to perform validation.
  */
 sealed interface Preference {
     val key: String

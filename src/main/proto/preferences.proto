@@ -1,4 +1,4 @@
-syntax = "proto2";
+edition = "2023";
 
 package com.charlesmuchene.datastore.preferences;
 

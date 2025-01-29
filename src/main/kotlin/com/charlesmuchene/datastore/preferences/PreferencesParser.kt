@@ -31,8 +31,9 @@ fun parsePreferences(content: ByteArray): List<Preference> {
     val data = try {
         DatastorePreferences.PreferenceMap.parseFrom(content)
     } catch (e: InvalidProtocolBufferException) {
-        throw MalformedContentException()
+        throw MalformedContentException(cause = e)
     }
+
     return data.preferencesMap.mapNotNull { (key, value) ->
         when (value.valueCase.number) {
             1 -> BooleanPreference(key = key, value = value.boolean.toString())

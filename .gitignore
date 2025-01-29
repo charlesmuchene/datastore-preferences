@@ -198,3 +198,5 @@ gradle-app.setting
 *.hprof
 # Ignore Gradle build output directory
 build
+
+.idea/misc.xml
