@@ -18,6 +18,7 @@ package com.charlesmuchene.datastore.preferences
 
 import com.charlesmuchene.datastore.preferences.exceptions.MalformedContentException
 import com.google.protobuf.InvalidProtocolBufferException
+import com.google.protobuf.kotlin.toByteStringUtf8
 
 /**
  * Parse [content] to a list of [Preference]s.
@@ -48,3 +49,29 @@ fun parsePreferences(content: ByteArray): List<Preference> {
         }
     }
 }
+
+/**
+ * Encode [preferences].
+ *
+ * @param preferences A [List] of [Preference]s to encode.
+ * @return [ByteArray]
+ */
+fun encodePreferences(preferences: List<Preference>): ByteArray = preferenceMap {
+    with(this.preferences) {
+        for (preference in preferences) {
+            val value = when (preference) {
+                is BooleanPreference -> value { boolean = preference.value.toBooleanStrict() }
+                is ByteArrayPreference -> value { bytesArray = preference.value.toByteStringUtf8() }
+                is DoublePreference -> value { double = preference.value.toDouble() }
+                is FloatPreference -> value { float = preference.value.toFloat() }
+                is IntPreference -> value { integer = preference.value.toInt() }
+                is LongPreference -> value { long = preference.value.toLong() }
+                is StringPreference -> value { string = preference.value.toString() }
+                is StringSetPreference -> value {
+                    stringSet = stringSet { }
+                }
+            }
+            put(key = preference.key, value = value)
+        }
+    }
+}.toByteArray()
